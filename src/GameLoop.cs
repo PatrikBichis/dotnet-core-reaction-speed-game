@@ -40,18 +40,10 @@ namespace dotnet_core_reaction_speed_game{
 
         private GpioController controller;
 
-        private LedType[] Leds = new LedType[5]{LedType.LED1,LedType.LED2,LedType.LED3,LedType.LED4,LedType.LED5};
-        private ConsoleKey[] Keys = new ConsoleKey[5]{ConsoleKey.D1,ConsoleKey.D2,ConsoleKey.D3,ConsoleKey.D4,ConsoleKey.D5};
-        private int[] Switches = new int[5]{1,2,3,4,5};
-
-        private bool[] LedStatus = new bool[5]{false,false,false,false,false};
-
-        private bool button_pressed = false;
-
-        private bool _correctButtonPressed = false;
-
         private int _maxPoints = 10;
         private int _deduction = 5;
+
+        private IDeviceService device;
 
         public void StartGame(){
             Console.WriteLine("*********************************************");
@@ -59,35 +51,36 @@ namespace dotnet_core_reaction_speed_game{
             Console.WriteLine("*********************************************");
 
             // Check if Gpio should be used?
-            if(UseKeyboard) InitGpioController();
+            if(UseKeyboard) device = new KeyboardService();
+            else device = new GpioSerivce();
             
 
             // Start light 1
             Console.WriteLine("- Starting led 1");
-            SetLedState(LedType.LED1, true);
+            device.SetLedState(LedType.LED1, true);
             Thread.Sleep(1000);
 
             // Start light 2
             Console.WriteLine("- Starting led 2");
-            SetLedState(LedType.LED2, true);
+            device.SetLedState(LedType.LED2, true);
             Thread.Sleep(1000);
 
             // Start light 3
             Console.WriteLine("- Starting led 3");
-            SetLedState(LedType.LED3, true);
+            device.SetLedState(LedType.LED3, true);
             Thread.Sleep(1000);
 
             // Start light 4
             Console.WriteLine("- Starting led 4");
-            SetLedState(LedType.LED4, true);
+            device.SetLedState(LedType.LED4, true);
             Thread.Sleep(1000);
 
             // Start light 5
             Console.WriteLine("- Starting led 5");
-            SetLedState(LedType.LED5, true);
+            device.SetLedState(LedType.LED5, true);
             Thread.Sleep(1000);
 
-            SetAllLedStates(false);
+            device.SetAllLedStates(false);
 
             GameLoop();
         }
@@ -107,39 +100,42 @@ namespace dotnet_core_reaction_speed_game{
                 TotalTime = TimeSpan.FromSeconds(0);
 
                 Console.WriteLine("Press the illuminated button to start");
-                SetLedState(LedType.LED3, true);
+                device.SetLedState(LedType.LED3, true);
                 
                 // Wait until the middle switch has been pressed.
-                #region Keyboard Simulation
-                if(UseKeyboard){
-                    WaitForKeyPressed(ConsoleKey.D3);
-                }
-                #endregion
+                RunGame = device.WaitForButtonPress(2);
+              
 
                 // Loop through all the leds and turn them on.
-                SetAllLedStates(true);
+                device.SetAllLedStates(true);
+                ShowGameStats();
 
                 // Start our countdown
                 Console.WriteLine("Starting in 5!");
                 Thread.Sleep(1000); // Wait 1 second
 
-                SetLedState(LedType.LED1, false);
+                device.SetLedState(LedType.LED1, false);
+                ShowGameStats();
                 Console.WriteLine("4!");
                 Thread.Sleep(1000); // Wait 1 second
 
-                SetLedState(LedType.LED2, false);
+                device.SetLedState(LedType.LED2, false);
+                ShowGameStats();
                 Console.WriteLine("3!");
                 Thread.Sleep(1000); // Wait 1 second
 
-                SetLedState(LedType.LED3, false);
+                device.SetLedState(LedType.LED3, false);
+                ShowGameStats();
                 Console.WriteLine("2!");
                 Thread.Sleep(1000); // Wait 1 second
 
-                SetLedState(LedType.LED4, false);
+                device.SetLedState(LedType.LED4, false);
+                ShowGameStats();
                 Console.WriteLine("1!");
                 Thread.Sleep(1000); // Wait 1 second
 
-                SetLedState(LedType.LED5, false);
+                device.SetLedState(LedType.LED5, false);
+                ShowGameStats();
                 Console.WriteLine("Go Go Go!");
                 Thread.Sleep(1000); // Wait 1 second
 
@@ -151,24 +147,26 @@ namespace dotnet_core_reaction_speed_game{
                     var random = new Random();
 
                     var random_delay =  random.Next(500,1500) / 1000; //Create a random number to be used as a delay to turn on a led. 
-		            var random_number = random.Next(0,Leds.Length); //Create another random number to be used to turn on one of the leds.
+		            var random_number = random.Next(0,device.Leds.Length); //Create another random number to be used to turn on one of the leds.
 
                     Thread.Sleep(random_delay); // Wait for a random amount of time, as defined above
 
-                    SetLedState(Leds[random_number], true); // Turn on a random led, as defined above
+                    device.SetLedState(device.Leds[random_number], true); // Turn on a random led, as defined above
+                    ShowGameStats();
 
                     var start = DateTime.Now; // Take a note of the time when the led was illuminated (so we can see how long it takes for the player to press the button)
 
-                    WaitForKeyPressedInGame(random_number);
+                    device.WaitForButtonPressInGeme(random_number);
 
                     var end = DateTime.Now; // Take note of the time when the button was pressed.
                     var timeTaken = end - start; // Calculate the time it took to press the button.
                     TotalTime += timeTaken; // Add time to total time.
-                    SetLedState(Leds[random_number], false);
+                    device.SetLedState(device.Leds[random_number], false);
+                    ShowGameStats();
                     
                     Console.WriteLine("Time taken: {0}", timeTaken);
 
-                    if( _correctButtonPressed){
+                    if( device.CorrectButtonPressed){
                         var points = Math.Round(20.0 - ((timeTaken.TotalSeconds*10.0)-1.0),2); // Crude points system. Score between 0 - 10 points. If you take longer than 1 second you score 0. If you take less than 0.1 seconds you score 10.
                         
                         Console.WriteLine("{0} points added to your score!", points);
@@ -190,141 +188,31 @@ namespace dotnet_core_reaction_speed_game{
 
                 // Once the game is over do a little flashy sequence.
                 for (var x=0; x<5; x++){
-                    for(var y=0; y<Leds.Length; y++){ 
-                        SetLedState(Leds[y], true);
+                    for(var y=0; y<device.Leds.Length; y++){ 
+                        device.SetLedState(device.Leds[y], true);
+                        ShowGameStats();
                         Thread.Sleep(200);
-                        SetLedState(Leds[y], false);
+                        device.SetLedState(device.Leds[y], false);
+                        ShowGameStats();
                     }
                 }
 
-                if(UseKeyboard) {
-                    Console.WriteLine("New score: {0}", score);
-                    Console.WriteLine("Total time: {0}", TotalTime);
-                    Console.WriteLine("Wrong presses: {0}", NrOfWrongPress);
-                }
+                
+                Console.WriteLine("New score: {0}", score);
+                Console.WriteLine("Total time: {0}", TotalTime);
+                Console.WriteLine("Wrong presses: {0}", NrOfWrongPress);
+                
             }
         }
 
         private void InitGpioController(){
 
         }
-
-        private void WaitForKeyPressedInGame(int keyIndex){
-            var lastKey = ConsoleKey.NoName;
-            while(lastKey == ConsoleKey.NoName){
-                Console.WriteLine("Press key: ");
-                var choice = Console.ReadKey(true).Key;
-                switch (choice)
-                {
-                    // 1 ! key
-                    case ConsoleKey.D1:
-                        Console.WriteLine("Key 1 pressed");
-                        lastKey = ConsoleKey.D1;
-                        break;
-                    //2 @ key
-                    case ConsoleKey.D2:
-                        Console.WriteLine("Key 2 pressed");
-                        lastKey = ConsoleKey.D2;
-                        break;
-                    //3 @ key
-                    case ConsoleKey.D3:
-                        Console.WriteLine("Key 3 pressed");
-                        lastKey = ConsoleKey.D3;
-                        break;
-                    //4 @ key
-                    case ConsoleKey.D4:
-                        Console.WriteLine("Key 4 pressed");
-                        lastKey = ConsoleKey.D4;
-                        break;
-                    //5 @ key
-                    case ConsoleKey.D5:
-                        Console.WriteLine("Key 5 pressed");
-                        lastKey = ConsoleKey.D5;
-                        break;
-                    //ESC @ key
-                    case ConsoleKey.Escape:
-                        Console.WriteLine("Closing game...");
-                        RunGame = false;
-                        break;
-                }
-
-                
-            }
-
-            _correctButtonPressed = false;
-                
-            if(lastKey == Keys[keyIndex]) _correctButtonPressed = true;
-        }
-
-        private void WaitForKeyPressed(ConsoleKey key){
-            var lastKey = ConsoleKey.NoName;
-
-            while (lastKey != key){
-                var choice = Console.ReadKey(true).Key;
-                switch (choice)
-                {
-                    // 1 ! key
-                    case ConsoleKey.D1:
-                        Console.WriteLine("Key 1 pressed");
-                        lastKey = ConsoleKey.D1;
-                        break;
-                    //2 @ key
-                    case ConsoleKey.D2:
-                        Console.WriteLine("Key 2 pressed");
-                        lastKey = ConsoleKey.D2;
-                        break;
-                    //3 @ key
-                    case ConsoleKey.D3:
-                        Console.WriteLine("Key 3 pressed");
-                        lastKey = ConsoleKey.D3;
-                        break;
-                    //4 @ key
-                    case ConsoleKey.D4:
-                        Console.WriteLine("Key 4 pressed");
-                        lastKey = ConsoleKey.D4;
-                        break;
-                    //5 @ key
-                    case ConsoleKey.D5:
-                        Console.WriteLine("Key 5 pressed");
-                        lastKey = ConsoleKey.D5;
-                        break;
-                    //ESC @ key
-                    case ConsoleKey.Escape:
-                        Console.WriteLine("Closing game...");
-                        RunGame = false;
-                        break;
-                }
-            }
-        }
-
-
-        private void SetAllLedStates(bool state){
-            foreach (var led in Leds)
-            {
-                SetLedState(led, state);
-            }
-        }
-
-        private void SetLedState(LedType led, bool state){
-            if(led == LedType.LED1)
-                LedStatus[0] = state;
-            else if(led == LedType.LED2)
-                LedStatus[1] = state;
-            else if(led == LedType.LED3)
-                LedStatus[2] = state;
-            else if(led == LedType.LED4)
-                LedStatus[3] = state;
-            else if(led == LedType.LED5)
-                LedStatus[4] = state;
-
-            ShowLedStatus();
-        }
-
-        
-        private void ShowLedStatus(){
-            Console.WriteLine("[{0}]         [{1}]", LedStatus[0] ? "*":"-", LedStatus[1] ? "*":"-");
-            Console.WriteLine("      [{0}]", LedStatus[2] ? "*":"-");
-            Console.WriteLine("[{0}]         [{1}]", LedStatus[3] ? "*":"-", LedStatus[4] ? "*":"-");
+      
+       private void ShowGameStats(){
+            Console.WriteLine("[{0}]         [{1}]", device.LedStatus[0] ? "*":"-", device.LedStatus[1] ? "*":"-");
+            Console.WriteLine("      [{0}]", device.LedStatus[2] ? "*":"-");
+            Console.WriteLine("[{0}]         [{1}]", device.LedStatus[3] ? "*":"-", device.LedStatus[4] ? "*":"-");
         }
     }
 }
