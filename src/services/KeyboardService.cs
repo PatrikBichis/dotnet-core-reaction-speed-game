@@ -1,4 +1,5 @@
 using System;
+using dotnet_core_reaction_speed_game.enums;
 
 namespace dotnet_core_reaction_speed_game{
     public class KeyboardService : IDeviceService{
@@ -22,7 +23,11 @@ namespace dotnet_core_reaction_speed_game{
 
         }
 
-        public bool WaitForButtonPressInGeme(int index){
+        public void Close(){
+            
+        }
+
+        public bool WaitForButtonPressInGame(int index){
             return WaitForKeyPressedInGame(index);
         }
 

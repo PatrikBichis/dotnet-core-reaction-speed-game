@@ -1,49 +1,27 @@
 using System;
 using System.Threading;
 using System.Device.Gpio;
+using dotnet_core_reaction_speed_game.enums;
+using dotnet_core_reaction_speed_game.models;
 
-namespace dotnet_core_reaction_speed_game{
-
-    public enum LedType {
-        LED1 = 5,
-        LED2 = 12,
-        LED3 = 17,
-        LED4 = 22,
-        LED5 = 25
-    }
-
-    public enum SwitcheType{
-        Switch1 = 6,
-        Switch2 = 13,
-        Switch3 = 19,
-        Switch4 = 23,
-        Switch5 = 24
-    }
-
+namespace dotnet_core_reaction_speed_game
+{
     public class ReactionSpeedGame{
-
-        public bool RunGame = true;
-        public bool UseKeyboard = true;
-
-        // Nr of buttons to press during a game
-        public int loop = 10;
-
-        // Nr of buttons that have been illuminated
-        public int counter = 0;
-
-        // Score for the current game session
-        public int score = 0;
-
-        public TimeSpan TotalTime;
-
-        public int NrOfWrongPress = 0;
 
         private GpioController controller;
 
-        private int _maxPoints = 10;
-        private int _deduction = 5;
-
         private IDeviceService device;
+
+        private GameConfig config;
+        
+
+        private GameData session;
+
+        public ReactionSpeedGame(bool UseGpio, bool UseMqttInterface)
+        {
+            config = new GameConfig();
+            config.UseGpio = !UseGpio;
+        }
 
         public void StartGame(){
             Console.WriteLine("*********************************************");
@@ -51,37 +29,15 @@ namespace dotnet_core_reaction_speed_game{
             Console.WriteLine("*********************************************");
 
             // Check if Gpio should be used?
-            if(UseKeyboard) device = new KeyboardService();
-            else device = new GpioSerivce();
+            if(config.UseGpio) device = new GpioSerivce();
+            else {
+                Console.WriteLine("Will simulate Gpio, you need to use keyboard keys 1-5!");
+                device = new KeyboardService();
+            }
             
-
-            // Start light 1
-            Console.WriteLine("- Starting led 1");
-            device.SetLedState(LedType.LED1, true);
-            Thread.Sleep(1000);
-
-            // Start light 2
-            Console.WriteLine("- Starting led 2");
-            device.SetLedState(LedType.LED2, true);
-            Thread.Sleep(1000);
-
-            // Start light 3
-            Console.WriteLine("- Starting led 3");
-            device.SetLedState(LedType.LED3, true);
-            Thread.Sleep(1000);
-
-            // Start light 4
-            Console.WriteLine("- Starting led 4");
-            device.SetLedState(LedType.LED4, true);
-            Thread.Sleep(1000);
-
-            // Start light 5
-            Console.WriteLine("- Starting led 5");
-            device.SetLedState(LedType.LED5, true);
-            Thread.Sleep(1000);
-
-            device.SetAllLedStates(false);
-
+            // Init check that leds are working
+            TurnOnLedsWithDelayAndTurnOff();
+            
             GameLoop();
         }
 
@@ -91,19 +47,16 @@ namespace dotnet_core_reaction_speed_game{
             Console.WriteLine("* Game is started.                          *");
             Console.WriteLine("*********************************************");
 
-            while(RunGame){
+            while(config.RunGame){
                 
-                // Reset game param
-                counter = 0;
-                score = 0;
-                NrOfWrongPress = 0;
-                TotalTime = TimeSpan.FromSeconds(0);
+                // Reset game data
+                session = new GameData();
 
-                Console.WriteLine("Press the illuminated button to start");
+                Console.WriteLine("Press the illuminated button to start a new game!");
                 device.SetLedState(LedType.LED3, true);
                 
                 // Wait until the middle switch has been pressed.
-                RunGame = device.WaitForButtonPress(2);
+                config.RunGame = device.WaitForButtonPress(2);
               
 
                 // Loop through all the leds and turn them on.
@@ -140,9 +93,9 @@ namespace dotnet_core_reaction_speed_game{
                 Thread.Sleep(1000); // Wait 1 second
 
                 // Start session
-                while(counter < loop){
+                while(session.Presses < config.NrOfLoop){
                     
-                    counter += 1; // Increment our counter variable by 1.
+                    session.Presses += 1; // Increment our counter variable by 1.
 
                     var random = new Random();
 
@@ -156,11 +109,11 @@ namespace dotnet_core_reaction_speed_game{
 
                     var start = DateTime.Now; // Take a note of the time when the led was illuminated (so we can see how long it takes for the player to press the button)
 
-                    device.WaitForButtonPressInGeme(random_number);
+                    device.WaitForButtonPressInGame(random_number);
 
                     var end = DateTime.Now; // Take note of the time when the button was pressed.
                     var timeTaken = end - start; // Calculate the time it took to press the button.
-                    TotalTime += timeTaken; // Add time to total time.
+                    session.TotalTime += timeTaken; // Add time to total time.
                     device.SetLedState(device.Leds[random_number], false);
                     ShowGameStats();
                     
@@ -173,15 +126,15 @@ namespace dotnet_core_reaction_speed_game{
                         if (points < 0) // This just makes sure you don't get a negative point
                             points = 0;
                         
-                        score += (int)points; // Add your points to your total score
+                        session.TotalScore += (int)points; // Add your points to your total score
 
                     }else{ // If you press the wrong button (not the button illuminated) you will lose some points!! 
-                        Console.Write("{0} points deducted from your score!", _deduction);
-                        NrOfWrongPress += 1;
-                        score -= _deduction;
+                        Console.Write("{0} points deducted from your score!", config.Deduction);
+                        session.NrOfWrongPresses += 1;
+                        session.TotalScore -= config.Deduction;
                     }
-                    Console.WriteLine("New score: {0}", score);
-                    Console.WriteLine("Total time: {0}", TotalTime);
+                    Console.WriteLine("New score: {0}", session.TotalScore);
+                    Console.WriteLine("Total time: {0}", session.TotalTime);
                         
                     Thread.Sleep(1);
                 }
@@ -198,15 +151,40 @@ namespace dotnet_core_reaction_speed_game{
                 }
 
                 
-                Console.WriteLine("New score: {0}", score);
-                Console.WriteLine("Total time: {0}", TotalTime);
-                Console.WriteLine("Wrong presses: {0}", NrOfWrongPress);
+                Console.WriteLine("New score: {0}", session.TotalScore);
+                Console.WriteLine("Total time: {0}", session.TotalTime);
+                Console.WriteLine("Wrong presses: {0}", session.NrOfWrongPresses);
                 
             }
         }
 
-        private void InitGpioController(){
+        private void TurnOnLedsWithDelayAndTurnOff(){
+            // Start light 1
+            Console.WriteLine("- Starting led 1");
+            device.SetLedState(LedType.LED1, true);
+            Thread.Sleep(1000);
 
+            // Start light 2
+            Console.WriteLine("- Starting led 2");
+            device.SetLedState(LedType.LED2, true);
+            Thread.Sleep(1000);
+
+            // Start light 3
+            Console.WriteLine("- Starting led 3");
+            device.SetLedState(LedType.LED3, true);
+            Thread.Sleep(1000);
+
+            // Start light 4
+            Console.WriteLine("- Starting led 4");
+            device.SetLedState(LedType.LED4, true);
+            Thread.Sleep(1000);
+
+            // Start light 5
+            Console.WriteLine("- Starting led 5");
+            device.SetLedState(LedType.LED5, true);
+            Thread.Sleep(1000);
+
+            device.SetAllLedStates(false);
         }
       
        private void ShowGameStats(){

@@ -1,4 +1,7 @@
-namespace dotnet_core_reaction_speed_game{
+using dotnet_core_reaction_speed_game.enums;
+
+namespace dotnet_core_reaction_speed_game
+{
     public interface IDeviceService
     {
 
@@ -11,11 +14,13 @@ namespace dotnet_core_reaction_speed_game{
 
         void Init();
 
+        void Close();
+
         void SetLedState(LedType led, bool state);
 
         void SetAllLedStates(bool state);
 
-        bool WaitForButtonPressInGeme(int index);
+        bool WaitForButtonPressInGame(int index);
 
         bool WaitForButtonPress(int index);
     }

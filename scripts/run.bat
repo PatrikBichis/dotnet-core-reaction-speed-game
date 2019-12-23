@@ -1,1 +1,1 @@
-docker run -it patrikbichis/speed-game -n speed-game
+docker run -it patrikbichis/speed-game --simualte -m
