@@ -73,7 +73,7 @@ namespace dotnet_core_reaction_speed_game{
 
             try{
                 while(!buttonPressed){
-                    if(controller.Read((int)Switches[index]) == PinValue.Low){
+                    if(controller.Read((int)Switches[index]) == PinValue.High){
                         buttonPressed = true;
                         Console.WriteLine("Key {0} pressed", index + 1);
                         break;
@@ -96,12 +96,18 @@ namespace dotnet_core_reaction_speed_game{
                 while(indexPressed == -1){
                     foreach (var _switch in Switches)
                     {
-                        if(controller.Read((int)Switches[index]) == PinValue.Low){
+                        if(controller.Read((int) _switch) == PinValue.High){
                             indexPressed = (int) _switch;
                             break;
                         }
                     }
                 }
+
+		Thread.Sleep(50);
+
+		while(controller.Read(indexPressed) == PinValue.High){
+		    Thread.Sleep(50);
+		}
 
                 _correctButton = false;
                 
@@ -117,6 +123,16 @@ namespace dotnet_core_reaction_speed_game{
                 Console.WriteLine(ex.ToString());
                 return false;
             }
+
+	    var allReleased = false;
+
+	    //while(!allReleased){
+	    //	foreach (var _switch in Switches){
+	    //	    if(controller.Read((int) _switch) == PinValue.High)
+	    //		break;
+	    //	    else
+	    //	}
+	    //}
 
             return true;
         }

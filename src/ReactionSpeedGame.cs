@@ -34,11 +34,15 @@ namespace dotnet_core_reaction_speed_game
                 Console.WriteLine("Will simulate Gpio, you need to use keyboard keys 1-5!");
                 device = new KeyboardService();
             }
+		
+	    device.Init();
             
             // Init check that leds are working
             TurnOnLedsWithDelayAndTurnOff();
             
             GameLoop();
+
+	    device.Close();
         }
 
         private void GameLoop(){
