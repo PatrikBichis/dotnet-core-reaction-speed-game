@@ -35,14 +35,14 @@ namespace dotnet_core_reaction_speed_game
                 device = new KeyboardService();
             }
 		
-	    device.Init();
+	        device.Init();
             
             // Init check that leds are working
             TurnOnLedsWithDelayAndTurnOff();
             
             GameLoop();
 
-	    device.Close();
+	        device.Close();
         }
 
         private void GameLoop(){
@@ -195,6 +195,10 @@ namespace dotnet_core_reaction_speed_game
             Console.WriteLine("[{0}]         [{1}]", device.LedStatus[0] ? "*":"-", device.LedStatus[1] ? "*":"-");
             Console.WriteLine("      [{0}]", device.LedStatus[2] ? "*":"-");
             Console.WriteLine("[{0}]         [{1}]", device.LedStatus[3] ? "*":"-", device.LedStatus[4] ? "*":"-");
+        }
+
+        public void CleanUp(){
+            device.Close();
         }
     }
 }

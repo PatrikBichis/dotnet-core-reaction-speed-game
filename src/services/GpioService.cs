@@ -1,5 +1,6 @@
 using System;
 using System.Device.Gpio;
+using System.Threading;
 using dotnet_core_reaction_speed_game.enums;
 
 namespace dotnet_core_reaction_speed_game{
@@ -36,10 +37,15 @@ namespace dotnet_core_reaction_speed_game{
             foreach (var _switch in Switches)
             {
                 controller.OpenPin((int)_switch, PinMode.Input);
+                controller.RegisterCallbackForPinValueChangedEvent((int)_switch, PinEventTypes.Falling, OnSwitchPressed);
             }
         }
 
         public void Close(){
+
+            // Turn of all leds
+            SetAllLedStates(false);
+
             // Close leds
             foreach (var led in Leds)
             {
@@ -49,8 +55,11 @@ namespace dotnet_core_reaction_speed_game{
             // Close switches
             foreach (var _switch in Switches)
             {
+                controller.UnregisterCallbackForPinValueChangedEvent((int) _switch, OnSwitchPressed);
                 controller.ClosePin((int)_switch);
             }
+
+            controller.Dispose();
         }
 
         public void SetAllLedStates(bool state)
@@ -64,6 +73,11 @@ namespace dotnet_core_reaction_speed_game{
         public void SetLedState(LedType led, bool state)
         {
              controller.Write((int)led, state ? PinValue.High : PinValue.Low);
+        }
+
+
+        private void OnSwitchPressed(object sender, PinValueChangedEventArgs pinValueChangedEventArgs){
+            Console.WriteLine(pinValueChangedEventArgs.PinNumber);
         }
 
         // Wait for a specific button to be pressed
