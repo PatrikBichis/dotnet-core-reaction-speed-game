@@ -117,11 +117,11 @@ namespace dotnet_core_reaction_speed_game{
                     }
                 }
 
-		Thread.Sleep(50);
+                Thread.Sleep(50);
 
-		while(controller.Read(indexPressed) == PinValue.High){
-		    Thread.Sleep(50);
-		}
+                while(controller.Read(indexPressed) == PinValue.High){
+                    Thread.Sleep(50);
+                }
 
                 _correctButton = false;
                 
@@ -138,15 +138,15 @@ namespace dotnet_core_reaction_speed_game{
                 return false;
             }
 
-	    var allReleased = false;
+            //var allReleased = false;
 
-	    //while(!allReleased){
-	    //	foreach (var _switch in Switches){
-	    //	    if(controller.Read((int) _switch) == PinValue.High)
-	    //		break;
-	    //	    else
-	    //	}
-	    //}
+            //while(!allReleased){
+            //	foreach (var _switch in Switches){
+            //	    if(controller.Read((int) _switch) == PinValue.High)
+            //		break;
+            //	    else
+            //	}
+            //}
 
             return true;
         }
