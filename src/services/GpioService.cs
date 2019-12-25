@@ -37,7 +37,7 @@ namespace dotnet_core_reaction_speed_game{
             foreach (var _switch in Switches)
             {
                 controller.OpenPin((int)_switch, PinMode.Input);
-                controller.RegisterCallbackForPinValueChangedEvent((int)_switch, PinEventTypes.Falling, OnSwitchPressed);
+                //controller.RegisterCallbackForPinValueChangedEvent((int)_switch, PinEventTypes.Falling, OnSwitchPressed);
             }
         }
 
@@ -55,7 +55,7 @@ namespace dotnet_core_reaction_speed_game{
             // Close switches
             foreach (var _switch in Switches)
             {
-                controller.UnregisterCallbackForPinValueChangedEvent((int) _switch, OnSwitchPressed);
+                //controller.UnregisterCallbackForPinValueChangedEvent((int) _switch, OnSwitchPressed);
                 controller.ClosePin((int)_switch);
             }
 
