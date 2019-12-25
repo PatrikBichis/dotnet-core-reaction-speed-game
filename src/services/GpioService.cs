@@ -9,7 +9,7 @@ namespace dotnet_core_reaction_speed_game{
         public LedType[] Leds { get => _leds; set => value = _leds; }
         public SwitcheType[] Switches { get => _switches; set => value = _switches; }
         public bool[] LedStatus { get => _ledStatus; set => value = _ledStatus; }
-        public bool CorrectButtonPressed { get => _correctButton; set{value = _correctButton;} }
+        public bool CorrectButtonPressed { get{ return _correctButton;} set{value = _correctButton;} }
 
         private bool _correctButton = false;
         private LedType[] _leds = new LedType[5]{LedType.LED1,LedType.LED2,LedType.LED3,LedType.LED4,LedType.LED5};
@@ -117,20 +117,22 @@ namespace dotnet_core_reaction_speed_game{
                     }
                 }
 
-                Thread.Sleep(50);
+                Thread.Sleep(150);
 
-                while(controller.Read(indexPressed) == PinValue.High){
-                    Thread.Sleep(50);
+                while(controller.Read(indexPressed) != PinValue.Low){
+                    Thread.Sleep(150);
                 }
+
+		Thread.Sleep(150);
 
                 _correctButton = false;
                 
                 // Check if the correct button was pressed
                 if(indexPressed == (int)Switches[index]) {
                     _correctButton = true;
-                    Console.WriteLine("Key {0} pressed", indexPressed + 1);
+                    Console.WriteLine("Key {0} pressed", Switchs[indexPressed]);
                 } else {
-                    Console.WriteLine("Wrong key {0} pressed!!!", indexPressed + 1);
+                    Console.WriteLine("Wrong key {0} pressed!!!({1})", Switches[indexPressed], Switches[index]);
                 }
 
             }catch(Exception ex){

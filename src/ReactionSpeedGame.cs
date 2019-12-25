@@ -119,7 +119,7 @@ namespace dotnet_core_reaction_speed_game
                     var timeTaken = end - start; // Calculate the time it took to press the button.
                     session.TotalTime += timeTaken; // Add time to total time.
                     device.SetLedState(device.Leds[random_number], false);
-                    ShowGameStats();
+                    //ShowGameStats();
                     
                     Console.WriteLine("Time taken: {0}", timeTaken);
 
@@ -147,10 +147,10 @@ namespace dotnet_core_reaction_speed_game
                 for (var x=0; x<5; x++){
                     for(var y=0; y<device.Leds.Length; y++){ 
                         device.SetLedState(device.Leds[y], true);
-                        ShowGameStats();
+                        //ShowGameStats();
                         Thread.Sleep(200);
                         device.SetLedState(device.Leds[y], false);
-                        ShowGameStats();
+                        //ShowGameStats();
                     }
                 }
 
