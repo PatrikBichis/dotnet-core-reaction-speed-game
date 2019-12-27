@@ -105,6 +105,7 @@ namespace dotnet_core_reaction_speed_game{
         public bool WaitForButtonPressInGame(int index)
         {
             var pressedIndex = -1;
+            _correctButton = false;
 
             try{
                 while(pressedIndex == -1){
@@ -119,16 +120,17 @@ namespace dotnet_core_reaction_speed_game{
                     }
                 }
 
+                // Debounce timeout
                 Thread.Sleep(150);
 
-                while(controller.Read(pressedIndex) != PinValue.Low){
+                // Check that the button is released
+                while(controller.Read((int) Switches[pressedIndex]) != PinValue.Low){
                     Thread.Sleep(150);
                 }
 
+                // Debounce timeout
 		        Thread.Sleep(150);
 
-                _correctButton = false;
-                
                 // Check if the correct button was pressed
                 if(pressedIndex == (int)Switches[index]) {
                     _correctButton = true;
