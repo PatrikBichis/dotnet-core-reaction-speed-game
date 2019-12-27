@@ -8,13 +8,10 @@ namespace dotnet_core_reaction_speed_game
 {
     public class ReactionSpeedGame{
 
-        private GpioController controller;
-
         private IDeviceService device;
 
         private GameConfig config;
         
-
         private GameData session;
 
         public ReactionSpeedGame(bool UseGpio, bool UseMqttInterface)

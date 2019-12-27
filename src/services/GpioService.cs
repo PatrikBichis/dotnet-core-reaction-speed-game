@@ -104,14 +104,16 @@ namespace dotnet_core_reaction_speed_game{
         // Wait for any switch to be closed and check if it's the correct one.
         public bool WaitForButtonPressInGame(int index)
         {
-            var indexPressed = -1;
+            var pressedIndex = -1;
 
             try{
-                while(indexPressed == -1){
-                    foreach (var _switch in Switches)
+                while(pressedIndex == -1){
+                    for (int i = 0; i < Switches.Length; i++)
                     {
-                        if(controller.Read((int) _switch) == PinValue.High){
-                            indexPressed = (int) _switch;
+                        if(controller.Read((int) Switches[i]) == PinValue.High){
+                            // Turn of led when the button is pressed
+                            SetLedState(Leds[i], false);
+                            pressedIndex = i;
                             break;
                         }
                     }
@@ -119,7 +121,7 @@ namespace dotnet_core_reaction_speed_game{
 
                 Thread.Sleep(150);
 
-                while(controller.Read(indexPressed) != PinValue.Low){
+                while(controller.Read(pressedIndex) != PinValue.Low){
                     Thread.Sleep(150);
                 }
 
@@ -128,27 +130,19 @@ namespace dotnet_core_reaction_speed_game{
                 _correctButton = false;
                 
                 // Check if the correct button was pressed
-                if(indexPressed == (int)Switches[index]) {
+                if(pressedIndex == (int)Switches[index]) {
                     _correctButton = true;
-                    Console.WriteLine("Key {0} pressed", Switches[indexPressed]);
+                    Console.WriteLine("Key {0} pressed", Switches[pressedIndex]);
                 } else {
-                    Console.WriteLine("Wrong key pressed!!!({0} -> {1})", Switches[indexPressed], Switches[index]);
+                    if(pressedIndex >= 0 && pressedIndex <= Switches.Length -1){
+                        Console.WriteLine("Wrong key pressed!!!({0} -> {1})", Switches[pressedIndex], Switches[index]);
+                    }else Console.WriteLine("Not a valid index on the pressed button!");
                 }
 
             }catch(Exception ex){
                 Console.WriteLine(ex.ToString());
                 return false;
             }
-
-            //var allReleased = false;
-
-            //while(!allReleased){
-            //	foreach (var _switch in Switches){
-            //	    if(controller.Read((int) _switch) == PinValue.High)
-            //		break;
-            //	    else
-            //	}
-            //}
 
             return true;
         }
