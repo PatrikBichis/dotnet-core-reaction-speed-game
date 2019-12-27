@@ -132,7 +132,7 @@ namespace dotnet_core_reaction_speed_game{
 		        Thread.Sleep(150);
 
                 // Check if the correct button was pressed
-                if(pressedIndex == (int)Switches[index]) {
+                if(pressedIndex == index) {
                     _correctButton = true;
                     Console.WriteLine("Key {0} pressed", Switches[pressedIndex]);
                 } else {
