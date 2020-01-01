@@ -73,6 +73,17 @@ namespace dotnet_core_reaction_speed_game{
         public void SetLedState(LedType led, bool state)
         {
              controller.Write((int)led, state ? PinValue.High : PinValue.Low);
+
+             if(led == LedType.LED1)
+                _ledStatus[0] = state;
+            else if(led == LedType.LED2)
+                _ledStatus[1] = state;
+            else if(led == LedType.LED3)
+                _ledStatus[2] = state;
+            else if(led == LedType.LED4)
+                _ledStatus[3] = state;
+            else if(led == LedType.LED5)
+                _ledStatus[4] = state; 
         }
 
 
