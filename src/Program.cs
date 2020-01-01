@@ -27,9 +27,9 @@ namespace dotnet_core_reaction_speed_game
             }
 
             // Add event to clean up on exit
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit); 
+            //AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit); 
 
-            TestProgram();
+            //TestProgram();
 
             game = new ReactionSpeedGame(simulate,mqttInterface);
 

@@ -5,6 +5,7 @@ namespace dotnet_core_reaction_speed_game.models
     public class GameConfig{
         public bool RunGame {get;set;}
         public bool UseGpio {get;set;}
+        public bool UseMqttInterface {get;set;}
 
         public bool SendMqttInfo {get;set;}
 
