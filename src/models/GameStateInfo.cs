@@ -13,7 +13,7 @@ namespace dotnet_core_reaction_speed_game.models
         public GameStateInfo(string clientId, GameState state, int countDown)
         {
             ClientId = clientId;
-            Topic = "reaction-speed-game/" + ClientId + "/state/";
+            Topic = "reaction-speed-game/" + ClientId + "/state";
             State = state.ToString();
             CountDown = countDown;
         }

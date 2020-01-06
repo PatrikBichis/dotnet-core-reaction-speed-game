@@ -9,9 +9,9 @@ namespace dotnet_core_reaction_speed_game.models
         public string Topic {get;set;}
         public bool? State {get;set;}
         public int Score {get;set;}
-        public int Seconds {get;set;}
+        public double Seconds {get;set;}
 
-        public SessionInfo(string clientId, int id, bool? state, int score, int seconds)
+        public SessionInfo(string clientId, int id, bool? state, int score, double seconds)
         {
             Id = id;
             ClientId = clientId;

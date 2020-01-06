@@ -4,6 +4,7 @@ using System.Device.Gpio;
 using dotnet_core_reaction_speed_game.enums;
 using dotnet_core_reaction_speed_game.models;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace dotnet_core_reaction_speed_game
 {
@@ -15,7 +16,9 @@ namespace dotnet_core_reaction_speed_game
 
         private GameConfig config;
         
-        private GameData session;
+        private GameData Result;
+
+        private List<SessionInfo> Sessions;
 
         private const string ClientId = "Game1";
 
@@ -80,7 +83,8 @@ namespace dotnet_core_reaction_speed_game
             while(config.RunGame){
                 
                 // Reset game data
-                session = new GameData();
+                Result = new GameData();
+                Sessions = new List<SessionInfo>();
 
                 // Send idle information
                 UpdateGameState(GameState.Idle, 0);
@@ -94,6 +98,7 @@ namespace dotnet_core_reaction_speed_game
 
                 // Send reset on session information
                 ResetSessionInformation();
+                ResetGameResultInformation();
               
                 // Loop through all the leds and turn them on.
                 device.SetAllLedStates(true);
@@ -141,9 +146,9 @@ namespace dotnet_core_reaction_speed_game
                 Thread.Sleep(1000); // Wait 1 second
 
                 // Start session
-                while(session.Presses < config.NrOfLoop){
+                while(Result.Presses < config.NrOfLoop){
                     
-                    session.Presses += 1; // Increment our counter variable by 1.
+                    Result.Presses += 1; // Increment our counter variable by 1.
 
                     var random = new Random();
 
@@ -161,7 +166,7 @@ namespace dotnet_core_reaction_speed_game
 
                     var end = DateTime.Now; // Take note of the time when the button was pressed.
                     var timeTaken = end - start; // Calculate the time it took to press the button.
-                    session.TotalTime += timeTaken; // Add time to total time.
+                    Result.TotalTime += timeTaken; // Add time to total time.
                     device.SetLedState(device.Leds[random_number], false);
                     ShowLedStats();
                     
@@ -176,23 +181,25 @@ namespace dotnet_core_reaction_speed_game
                         if (points < 0) // This just makes sure you don't get a negative point
                             points = 0;
                         
-                        session.TotalScore += (int)points; // Add your points to your total score
+                        Result.TotalScore += (int)points; // Add your points to your total score
 
                     }else{ // If you press the wrong button (not the button illuminated) you will lose some points!! 
                         Console.Write("{0} points deducted from your score!", config.Deduction);
-                        session.NrOfWrongPresses += 1;
-                        session.TotalScore -= config.Deduction;
+                        Result.NrOfWrongPresses += 1;
+                        Result.TotalScore -= config.Deduction;
                     }
-                    Console.WriteLine("New score: {0}", session.TotalScore);
-                    Console.WriteLine("Total time: {0}", session.TotalTime);
+                    Console.WriteLine("New score: {0}", Result.TotalScore);
+                    Console.WriteLine("Total time: {0}", Result.TotalTime);
                         
                     // Send session information 
-                    SendSessionInformation(session.Presses, device.CorrectButtonPressed, (int)points, (int)timeTaken.TotalSeconds);
+                    SendSessionInformation(Result.Presses, device.CorrectButtonPressed, (int)points, timeTaken.TotalSeconds);
+                    Sessions.Add(new SessionInfo(ClientId, Result.Presses, device.CorrectButtonPressed, (int)points, timeTaken.TotalSeconds));
 
                     Thread.Sleep(1);
                 }
 
                 UpdateGameState(GameState.Ended, 0);
+                SendGameResultInformation(Result, Sessions);
 
                 // Once the game is over do a little flashy sequence.
                 for (var x=0; x<5; x++){
@@ -205,10 +212,9 @@ namespace dotnet_core_reaction_speed_game
                     }
                 }
 
-                
-                Console.WriteLine("New score: {0}", session.TotalScore);
-                Console.WriteLine("Total time: {0}", session.TotalTime);
-                Console.WriteLine("Wrong presses: {0}", session.NrOfWrongPresses);
+                Console.WriteLine("New score: {0}", Result.TotalScore);
+                Console.WriteLine("Total time: {0}", Result.TotalTime);
+                Console.WriteLine("Wrong presses: {0}", Result.NrOfWrongPresses);
                 
             }
         }
@@ -249,9 +255,24 @@ namespace dotnet_core_reaction_speed_game
             }
         }
 
-        private void SendSessionInformation(int index, bool? state, int score, int seconds){
+        private void SendSessionInformation(int index, bool? state, int score, double seconds){
             if(config.UseMqttInterface && mqtt.GetConnectionStatus()){
                 var msg = new SessionInfo(ClientId, index, state, score, seconds);
+                mqtt.SendMsg(msg.Topic, JsonConvert.SerializeObject(msg));
+            }
+        }
+
+        private void SendGameResultInformation(GameData result, List<SessionInfo> sessions){
+            if(config.UseMqttInterface && mqtt.GetConnectionStatus()){
+                var msg = new GameResultInfo(ClientId, result, sessions);
+                mqtt.SendMsg(msg.Topic, JsonConvert.SerializeObject(msg));
+            }
+        }
+
+        private void ResetGameResultInformation(){
+            if(config.UseMqttInterface && mqtt.GetConnectionStatus()){
+                var result = new GameData();
+                var msg = new GameResultInfo(ClientId, result, new List<SessionInfo>());
                 mqtt.SendMsg(msg.Topic, JsonConvert.SerializeObject(msg));
             }
         }

@@ -45,6 +45,7 @@ namespace dotnet_core_reaction_speed_game{
         // }
 
         public void SendMsg(string topic, string message){
+            Console.WriteLine("Sending topic {0}.", topic);
             Task.Run(() => mqttClient.PublishAsync(topic, message));
         }
 
