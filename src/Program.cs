@@ -22,7 +22,7 @@ namespace dotnet_core_reaction_speed_game
                         Console.WriteLine("arg: {0}",arg);
                     }
                 }
-            }catch(Exception ex){
+            }catch{
                 Console.WriteLine("Error when reading the args, will use defualt!!!");
             }
 

@@ -1,0 +1,8 @@
+
+  speed-game:
+    container_name: speed-game
+    build: .
+    command: -m
+    restart: unless-stopped
+    device:
+      - /dev/gpiomem
