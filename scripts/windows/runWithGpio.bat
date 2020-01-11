@@ -1,0 +1,1 @@
+docker run --device /dev/gpiomem -it patrikbichis/speed-game -m

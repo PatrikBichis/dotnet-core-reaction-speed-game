@@ -21,7 +21,7 @@ namespace dotnet_core_reaction_speed_game{
                 .WithAutoReconnectDelay(TimeSpan.FromSeconds(5))
                 .WithClientOptions(new MqttClientOptionsBuilder()
                     .WithClientId("ReactionSpeedGame")
-                    .WithTcpServer("192.168.1.199")
+                    .WithTcpServer("mosquitto")
                     .Build())
                 .Build();
 

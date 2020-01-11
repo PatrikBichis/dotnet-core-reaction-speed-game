@@ -31,9 +31,13 @@ namespace dotnet_core_reaction_speed_game
 
             //TestProgram();
 
-            game = new ReactionSpeedGame(simulate,mqttInterface);
+            try{
+                game = new ReactionSpeedGame(simulate,mqttInterface);
 
-            game.StartGame();
+                game.StartGame();
+            }catch(Exception ex){
+                Console.WriteLine("Error in game:" + ex.ToString());
+            }
         }
 
         static void CurrentDomain_ProcessExit(object sender, EventArgs e)

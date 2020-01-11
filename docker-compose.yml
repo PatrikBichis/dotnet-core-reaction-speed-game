@@ -62,12 +62,22 @@ services:
       - ./volumes/mosquitto/:/mosquitto/
       - ./services/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
+  # When you want to run with GPIO
+  # -------------------------------------
+  # speed-game:
+  #   container_name: speed-game
+  #   build: .
+  #   command: -m
+  #   restart: unless-stopped
+  #   devices:
+  #     - /dev/gpiomem:/dev/gpiomem
+
+  # When you want to run with keyboard
+  # -------------------------------------
   speed-game:
     container_name: speed-game
     build: .
-    command: -m
+    command: -s -m
     restart: unless-stopped
-    devices:
-      - /dev/gpiomem:/dev/gpiomem
 
     

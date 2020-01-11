@@ -29,11 +29,10 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Oo]ut/
-volumes/grafana/
-volumes/influxdb/
-volumes/mosquitto/
-volumes/portainer/
-volumes/noderedd/data/
+volumes/grafana
+volumes/influxdb
+volumes/mosquitto
+volumes/portainer
 msbuild.log
 msbuild.err
 msbuild.wrn
