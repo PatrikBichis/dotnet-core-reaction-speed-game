@@ -1,4 +1,4 @@
-# Reaction Speed Game (.Net Core and Docer and more!)
+# The Reaction Speed Game (.Net Core and Docker and more!)
 ![enter image description here](https://github.com/PatrikBichis/dotnet-core-reaction-speed-game/raw/master/docs/speedgame.jpg)
 
 This repository is for a simple reaction speed game build to learn and demonstrate how docker and .Net Core can be used for fast development of IOT and embedded projects.  The project is also using Node-Red for game interface and also to collect data and storing it in InfluxDB, it also using Grafana to show analytics from game play. And lastly there is two more containers a Mosquitto container to handle communication (MQTT) between the containers, there is also a Portainer container to monitor and handle the docker containers in a easy way. 
