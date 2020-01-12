@@ -61,7 +61,7 @@ Then game will light up all the buttons and count down by turning off a button e
 
 You need to repeat that 10 times and then all the buttons start to light up and turning off randomly and a voice will tell you how you did.
 
-You will see how well you did for each button press and also you total time an score, you can also press the high score button to see how you did against all others how played this game.
+You will see how well you did for each button press and also your total time and score, you can also press the high score button to see how you did against all others how played this game.
 
 ![enter image description here](https://github.com/PatrikBichis/dotnet-core-reaction-speed-game/raw/master/docs/gameui.JPG)
 
