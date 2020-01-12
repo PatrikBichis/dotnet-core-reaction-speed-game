@@ -1,6 +1,6 @@
 # Reaction Speed Game (.Net Core and Docer and more!)
 
-This repository is for a simple reaction speed game build to learn and demonstrate how docker and .net Core can be used for fast development.  The project is also using Node-Red for game interface and also to collect data and storing it in InfluxDB, it also using Grafana to show analytics from game play. And lastly there is two more containers a Mosquitto container to handle communication (MQTT) between the containers, there is also a Portainer container to monitor and handle the docker containers in a easy way. 
+This repository is for a simple reaction speed game build to learn and demonstrate how docker and .Net Core can be used for fast development of IOT and embedded projects.  The project is also using Node-Red for game interface and also to collect data and storing it in InfluxDB, it also using Grafana to show analytics from game play. And lastly there is two more containers a Mosquitto container to handle communication (MQTT) between the containers, there is also a Portainer container to monitor and handle the docker containers in a easy way. 
 
 The hardware used in this project is the [Raspberry Pi Reaction Speed Game Kit](https://thepihut.com/products/raspberry-pi-reaction-speed-game-kit), it's easy to assamble and they also provide a Phyton script for playing the game. But was is the fun to use that and also I don't like Phyton so we have made ours own .Net Core code for it instead. I also wanted to add some IOT and analytics to the project.
 
