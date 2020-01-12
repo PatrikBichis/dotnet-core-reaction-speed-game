@@ -86,6 +86,9 @@ First time you access you get to create a local account to access the portainer 
 
 ## Node-Red
 We use Node-red to handle all the MQTT data that are sent from the Speed-game, we also use Node-Red to create the game user interface. Node-red will store the data in InfluxDB to be used for analytics.
+
+All the containers volumes are inside the repository but the only one we commit is the Node-Red one /volumes/nodered/data. It contains the Node-Red code so when you pull the code and run the docker compose file the Node-Red container will load the code and execute it automatically.
+
 ![enter image description here](https://github.com/PatrikBichis/dotnet-core-reaction-speed-game/raw/master/docs/nodered1.JPG)
 ### Accessing
 [http://hostname_ip:1880](http://hostname_ip:1880) (For programing ui)
