@@ -28,7 +28,7 @@ I made script for all the different tasks to simplify the handling of the docker
 
 *There are a lot more scripts but these are the most impotent.*
 
-
+> To get this running on the Raspberry Pi  you just clone this repository and run the script ./scripts/start.sh and that's it. *(All the needed containers will be downloaded and built and started automatically)* 
 
 I developed the hole program and the IOT parts before assembling the hardware, I used Docker Desktop to run the containers on my Windows computer. To simulating the hardware I simulating the input I used keyboard numbers 1-5 and outputting the button LED states to the console output. When running the game on my developing computer I comment the speed-game part from the docker compose file. So I easier could build the .Net Core code and starting it with the simulation (-s) parameter added. The -m parameter is if the game should publish MQTT information, that information is used for the IOT part. (Used the /scripts/windows/buildAndRun.bat script)
 
@@ -59,6 +59,8 @@ Then game will light up all the buttons and count down by turning off a button e
 You need to repeat that 10 times and then all the buttons start to light up and turning off randomly and a voice will tell you how you did.
 
 You will see how well you did for each button press and also you total time an score, you can also press the high score button to see how you did against all others how played this game.
+
+![enter image description here](https://github.com/PatrikBichis/dotnet-core-reaction-speed-game/raw/master/docs/gameui.JPG)
 
 You access the game user interface by a web browser at the following address [http://\[hostname/ip\]:1880/ui](http://hostname_ip:1880/ui).
 
