@@ -42,9 +42,11 @@ Then when we build and run the code on the Raspberry Pi we connect the GPIO pins
 docker run **--device /dev/gpiomem** -it patrikbichis/speed-game -m*
 
 # The game play
-The game will startup automatically on the Raspbarry Pi and flashing all the LED's when it's starting up. The white LED will light when the game is ready to start playing. The user enter some user data as bellow and then starting the game by pressing the white LED button. *(If the user don't enter any data it will run on the last   
-input data.)*
+The game will startup automatically on the Raspbarry Pi and flashing all the LED's when it's initialising the game. The white LED will light up when the game is ready to be started. You start the game by pressing the white LED button.
 
+![enter image description here](https://github.com/PatrikBichis/dotnet-core-reaction-speed-game/raw/master/docs/gamestart.JPG)
+
+The user can enter some user data as bellow, it will be used by the anlytics part. *(If the user don't enter any data it will run on the last input data.)*
  - Name 
  - Gender
  - Age
@@ -64,6 +66,9 @@ You will see how well you did for each button press and also you total time an s
 ![enter image description here](https://github.com/PatrikBichis/dotnet-core-reaction-speed-game/raw/master/docs/gameui.JPG)
 
 You access the game user interface by a web browser at the following address [http://\[hostname/ip\]:1880/ui](http://hostname_ip:1880/ui).
+
+# The analytics
+N/A
 
 # Containers
 
